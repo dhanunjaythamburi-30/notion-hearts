@@ -1,4 +1,10 @@
-<style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Hearts Only</title>
+    <style>
         * { 
             margin: 0; 
             padding: 0; 
@@ -14,155 +20,116 @@
         .hearts-container {
             position: relative;
             width: 100%;
-            height: 60vh; /* Reduced height for shorter falling distance */
+            height: 60vh;
             background: transparent;
             overflow: hidden;
         }
         
         .falling-heart {
             position: absolute;
-            font-size: 28px;
-            animation: greenHeartFall linear infinite;
-            filter: blur(0px);
-            opacity: 0.8; /* Start with transparency */
+            font-size: 24px;
+            animation: smoothFall linear forwards;
+            user-select: none;
+            pointer-events: none;
+            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
         }
         
-        /* Green heart falling animation with blur increase */
-        @keyframes greenHeartFall {
+        /* Smooth falling animation - no blinking, no complex effects */
+        @keyframes smoothFall {
             0% { 
-                transform: translateY(-80px) rotate(0deg); 
-                opacity: 0;
-                filter: blur(0px);
-            }
-            10% { 
+                transform: translateY(-50px); 
                 opacity: 0.9;
-                filter: blur(0px);
             }
-            50% {
+            5% { 
+                opacity: 1;
+            }
+            95% {
                 opacity: 0.8;
-                filter: blur(0.5px);
-            }
-            80% {
-                opacity: 0.6;
-                filter: blur(1.5px); /* Increasing blur */
             }
             100% { 
-                transform: translateY(60vh) rotate(180deg); /* Shorter distance */
-                opacity: 0.2;
-                filter: blur(3px); /* Maximum blur at bottom */
+                transform: translateY(65vh); 
+                opacity: 0.3;
             }
         }
         
-        /* Different heart sizes and speeds */
-        .heart-small {
-            font-size: 20px;
-            animation-duration: 3s;
-        }
-        
-        .heart-medium {
-            font-size: 28px;
-            animation-duration: 4s;
-        }
-        
-        .heart-large {
-            font-size: 36px;
-            animation-duration: 5s;
-        }
-        
-        /* Green color variations */
-        .green-light { color: #00ff88; text-shadow: 0 0 10px rgba(0, 255, 136, 0.5); }
-        .green-medium { color: #00cc66; text-shadow: 0 0 10px rgba(0, 204, 102, 0.5); }
-        .green-dark { color: #009944; text-shadow: 0 0 10px rgba(0, 153, 68, 0.5); }
-        .green-emerald { color: #10b981; text-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
-        .green-mint { color: #34d399; text-shadow: 0 0 10px rgba(52, 211, 153, 0.5); }
+        /* Size variations for green hearts */
+        .size-1 { font-size: 18px; }
+        .size-2 { font-size: 22px; }
+        .size-3 { font-size: 26px; }
+        .size-4 { font-size: 30px; }
+        .size-5 { font-size: 34px; }
     </style>
 </head>
 <body>
     <div class="hearts-container" id="heartsContainer"></div>
     
     <script>
-        const greenHeartSymbols = ["💚", "💖", "💕", "💗", "🤍", "💛", "🩷"];
-        const greenColors = ['green-light', 'green-medium', 'green-dark', 'green-emerald', 'green-mint'];
-        const heartSizes = ['heart-small', 'heart-medium', 'heart-large'];
+        const sizes = ['size-1', 'size-2', 'size-3', 'size-4', 'size-5'];
         
         function createGreenHeart() {
             const heart = document.createElement('div');
             heart.className = 'falling-heart';
             
-            // Random green heart symbol (prioritize green hearts)
-            const symbol = Math.random() < 0.7 ? "💚" : greenHeartSymbols[Math.floor(Math.random() * greenHeartSymbols.length)];
-            heart.textContent = symbol;
+            // ONLY green heart emoji
+            heart.textContent = "💚";
             
-            // Random position across width
-            heart.style.left = Math.random() * 100 + '%';
+            // Random horizontal position
+            heart.style.left = Math.random() * 95 + '%';
             
-            // Random size class
-            const sizeClass = heartSizes[Math.floor(Math.random() * heartSizes.length)];
+            // Random size
+            const sizeClass = sizes[Math.floor(Math.random() * sizes.length)];
             heart.classList.add(sizeClass);
             
-            // Random green color class
-            const colorClass = greenColors[Math.floor(Math.random() * greenColors.length)];
-            heart.classList.add(colorClass);
-            
-            // Random animation duration (shorter for less distance)
-            const duration = 2.5 + Math.random() * 2; // 2.5 to 4.5 seconds
+            // Random duration for variety (shorter distance)
+            const duration = 2.8 + Math.random() * 1.5; // 2.8 to 4.3 seconds
             heart.style.animationDuration = duration + 's';
             
-            // Random delay for staggered effect
-            heart.style.animationDelay = Math.random() * 1 + 's';
-            
-            // Add slight horizontal sway
-            const sway = (Math.random() - 0.5) * 50;
-            heart.style.setProperty('--sway', sway + 'px');
-            
+            // Add to container
             document.getElementById('heartsContainer').appendChild(heart);
             
-            // Remove heart after animation completes
+            // Clean removal after animation
             setTimeout(() => {
                 if (heart.parentNode) {
                     heart.parentNode.removeChild(heart);
                 }
-            }, (duration + 1) * 1000); // Add 1s buffer
+            }, duration * 1000 + 500);
         }
         
-        // Continuous heart generation
-        function startContinuousGreenHearts() {
-            // Initial burst
-            for (let i = 0; i < 8; i++) {
+        // Continuous green heart generation
+        function startGreenHeartRain() {
+            // Immediate start with some hearts
+            for (let i = 0; i < 5; i++) {
                 setTimeout(() => {
                     createGreenHeart();
-                }, i * 200);
+                }, i * 150);
             }
             
-            // Continuous generation every 400ms
+            // Continuous generation - only green hearts
             setInterval(() => {
                 createGreenHeart();
                 
-                // Sometimes create 2 hearts at once for variety
-                if (Math.random() < 0.3) {
+                // Occasionally create 2 hearts close together
+                if (Math.random() < 0.25) {
                     setTimeout(() => {
                         createGreenHeart();
-                    }, 100);
+                    }, 80);
                 }
-            }, 400);
+            }, 350); // Every 350ms
         }
         
-        // Start immediately when page loads
+        // Auto-start
         window.addEventListener('load', () => {
-            setTimeout(startContinuousGreenHearts, 200);
+            setTimeout(startGreenHeartRain, 300);
         });
         
-        // Ensure continuous animation doesn't stop
+        // Backup generation to ensure continuous flow
         setInterval(() => {
-            // Check if hearts are still being generated
-            const currentHearts = document.querySelectorAll('.falling-heart').length;
-            if (currentHearts < 5) {
-                // If too few hearts, generate more
-                for (let i = 0; i < 3; i++) {
-                    setTimeout(() => createGreenHeart(), i * 150);
-                }
+            const activeHearts = document.querySelectorAll('.falling-heart').length;
+            if (activeHearts < 3) {
+                createGreenHeart();
+                createGreenHeart();
             }
-        }, 3000);
+        }, 2000);
     </script>
 </body>
 </html>
