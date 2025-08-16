@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Single Burst Hearts</title>
+    <title>Big Blast Hearts - FireShot Style</title>
     <style>
         * { 
             margin: 0; 
@@ -29,12 +29,44 @@
             z-index: 9999;
         }
         
+        /* Manual Trigger Button */
+        .trigger-button {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10000;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+            transition: all 0.3s ease;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        
+        .trigger-button:hover {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            transform: translateX(-50%) translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+        }
+        
+        .trigger-button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: translateX(-50%);
+        }
+        
         /* CSS Heart Shape */
         .css-heart {
             position: absolute;
             width: 20px;
             height: 18px;
-            animation: singleBlastFall ease-in forwards;
+            animation: bigBlastExplosion ease-out forwards;
             will-change: transform, opacity;
         }
         
@@ -119,60 +151,60 @@
         .green-4:before, .green-4:after { background: #10b981; }
         .green-5:before, .green-5:after { background: #059669; }
         
-        /* Single blast animation - starts from center top, spreads out */
-        @keyframes singleBlastFall {
+        /* BIG BLAST EXPLOSION - Hearts spread in ALL directions */
+        @keyframes bigBlastExplosion {
             0% { 
-                transform: translateY(-30px) translateX(0px) scale(0.8); 
+                transform: translateX(-50%) translateY(-50%) scale(0.5) rotate(0deg); 
                 opacity: 0;
             }
-            10% { 
+            5% {
+                transform: translateX(-50%) translateY(-50%) scale(1) rotate(0deg); 
                 opacity: 1;
-                transform: translateY(10px) translateX(var(--spread)) scale(1);
-            }
-            90% {
-                opacity: 0.6;
             }
             100% { 
-                transform: translateY(100vh) translateX(var(--spread)) scale(0.9); 
+                transform: 
+                    translateX(calc(-50% + var(--blast-x))) 
+                    translateY(calc(-50% + var(--blast-y))) 
+                    scale(0.8) 
+                    rotate(var(--rotation));
                 opacity: 0;
             }
         }
         
-        /* Completion message */
-        .completion-message {
+        /* Status message */
+        .status-message {
             position: fixed;
-            top: 20px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(34, 197, 94, 0.9);
             color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
+            padding: 8px 16px;
+            border-radius: 15px;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            font-size: 14px;
+            font-size: 12px;
             opacity: 0;
             z-index: 10000;
-            animation: showMessage 3s ease-in-out 8s forwards;
-        }
-        
-        @keyframes showMessage {
-            0%, 80% { opacity: 0; }
-            10%, 70% { opacity: 1; }
-            100% { opacity: 0; }
+            transition: opacity 0.3s ease;
         }
     </style>
 </head>
 <body>
+    <button class="trigger-button" id="heartBlastBtn" onclick="triggerBigBlast()">
+        💥 BIG HEART BLAST
+    </button>
+    
     <div class="hearts-container" id="heartsContainer"></div>
-    <div class="completion-message" id="completionMsg">🎉 Hearts celebration complete!</div>
+    <div class="status-message" id="statusMsg">Ready for BIG BLAST!</div>
     
     <script>
         const heartSizes = ['heart-small', 'heart-medium', 'heart-large', 'heart-xlarge'];
         const greenShades = ['green-1', 'green-2', 'green-3', 'green-4', 'green-5'];
         let heartsCreated = 0;
-        const maxHearts = 30; // Total hearts in the blast
+        let isBlasting = false;
+        const maxHearts = 50; // More hearts for bigger blast
         
-        function createBlastHeart(delay = 0) {
+        function createExplosionHeart(delay = 0) {
             if (heartsCreated >= maxHearts) return;
             
             setTimeout(() => {
@@ -187,14 +219,30 @@
                 const colorClass = greenShades[Math.floor(Math.random() * greenShades.length)];
                 heart.classList.add(colorClass);
                 
-                // Start from center top, then spread horizontally
-                const centerX = 50; // Start from center
-                const spreadAmount = (Math.random() - 0.5) * 200; // Spread left/right
-                heart.style.left = centerX + '%';
-                heart.style.setProperty('--spread', spreadAmount + 'px');
+                // START FROM CENTER OF SCREEN
+                heart.style.left = '50%';
+                heart.style.top = '50%';
                 
-                // Random duration (3 to 6 seconds)
-                const duration = 3 + Math.random() * 3;
+                // CALCULATE EXPLOSION DIRECTION (360 degrees)
+                const angle = (heartsCreated / maxHearts) * Math.PI * 2 + (Math.random() - 0.5) * 0.8;
+                
+                // EXPLOSION DISTANCE (cover entire screen)
+                const distance = 200 + Math.random() * 400; // 200-600px from center
+                
+                // CALCULATE X,Y EXPLOSION COORDINATES
+                const blastX = Math.cos(angle) * distance;
+                const blastY = Math.sin(angle) * distance;
+                
+                // Random rotation
+                const rotation = Math.random() * 720 - 360;
+                
+                // Set CSS custom properties for explosion
+                heart.style.setProperty('--blast-x', blastX + 'px');
+                heart.style.setProperty('--blast-y', blastY + 'px');
+                heart.style.setProperty('--rotation', rotation + 'deg');
+                
+                // Random duration (2-4 seconds)
+                const duration = 2 + Math.random() * 2;
                 heart.style.animationDuration = duration + 's';
                 
                 // Add to container
@@ -211,34 +259,54 @@
             }, delay);
         }
         
-        // Single blast function
-        function startHeartBlast() {
-            console.log('🎉 Starting heart blast!');
+        // BIG BLAST FUNCTION
+        function triggerBigBlast() {
+            if (isBlasting) return;
             
-            // Create hearts in quick succession (blast effect)
+            // Reset
+            heartsCreated = 0;
+            isBlasting = true;
+            
+            // Update UI
+            const button = document.getElementById('heartBlastBtn');
+            const statusMsg = document.getElementById('statusMsg');
+            
+            button.textContent = '💥 EXPLODING...';
+            button.disabled = true;
+            
+            statusMsg.textContent = 'BIG BLAST IN PROGRESS! 🎆';
+            statusMsg.style.opacity = '1';
+            
+            // Clear existing hearts
+            document.getElementById('heartsContainer').innerHTML = '';
+            
+            console.log('💥 BIG HEART BLAST TRIGGERED!');
+            
+            // CREATE EXPLOSION - all hearts burst out rapidly
             for (let i = 0; i < maxHearts; i++) {
-                createBlastHeart(i * 100); // 100ms delay between each heart
+                createExplosionHeart(i * 50); // Very rapid - 50ms between hearts
             }
             
-            // Show completion message after all hearts are created
+            // Reset after blast
             setTimeout(() => {
-                console.log('✅ Heart blast complete!');
-            }, maxHearts * 100 + 8000);
+                button.textContent = '💥 BIG HEART BLAST';
+                button.disabled = false;
+                isBlasting = false;
+                
+                statusMsg.textContent = 'Explosion complete! Click for another blast!';
+                setTimeout(() => {
+                    statusMsg.style.opacity = '0';
+                }, 3000);
+            }, maxHearts * 50 + 5000);
         }
         
-        // Auto-start the blast after page loads
+        // Initialize
         window.addEventListener('load', () => {
-            setTimeout(startHeartBlast, 500);
-        });
-        
-        // Optional: Restart blast on click (for testing)
-        document.addEventListener('click', () => {
-            if (heartsCreated >= maxHearts) {
-                heartsCreated = 0;
-                // Clear any remaining hearts
-                document.getElementById('heartsContainer').innerHTML = '';
-                setTimeout(startHeartBlast, 200);
-            }
+            const statusMsg = document.getElementById('statusMsg');
+            statusMsg.style.opacity = '1';
+            setTimeout(() => {
+                statusMsg.style.opacity = '0';
+            }, 3000);
         });
     </script>
 </body>
