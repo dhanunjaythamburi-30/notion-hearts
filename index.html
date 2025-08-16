@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Green Hearts Only</title>
+    <title>FireShot CSS Hearts</title>
     <style>
         * { 
             margin: 0; 
@@ -25,111 +25,186 @@
             overflow: hidden;
         }
         
-        .falling-heart {
+        /* CSS Heart Shape - exactly like FireShot */
+        .css-heart {
             position: absolute;
-            font-size: 24px;
-            animation: smoothFall linear forwards;
-            user-select: none;
-            pointer-events: none;
-            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+            width: 20px;
+            height: 18px;
+            animation: heartDrop linear forwards;
+            will-change: transform, opacity;
         }
         
-        /* Smooth falling animation - no blinking, no complex effects */
-        @keyframes smoothFall {
+        .css-heart:before,
+        .css-heart:after {
+            content: '';
+            width: 12px;
+            height: 18px;
+            position: absolute;
+            left: 10px;
+            top: 0;
+            background: #22c55e; /* Green color */
+            border-radius: 10px 10px 0 0;
+            transform: rotate(-45deg);
+            transform-origin: 0 100%;
+        }
+        
+        .css-heart:after {
+            left: 0;
+            transform: rotate(45deg);
+            transform-origin: 100% 100%;
+        }
+        
+        /* Heart size variations */
+        .heart-small {
+            width: 16px;
+            height: 14px;
+        }
+        
+        .heart-small:before,
+        .heart-small:after {
+            width: 10px;
+            height: 14px;
+            left: 8px;
+        }
+        
+        .heart-small:after {
+            left: 0;
+        }
+        
+        .heart-medium {
+            width: 20px;
+            height: 18px;
+        }
+        
+        .heart-large {
+            width: 24px;
+            height: 22px;
+        }
+        
+        .heart-large:before,
+        .heart-large:after {
+            width: 14px;
+            height: 22px;
+            left: 12px;
+        }
+        
+        .heart-large:after {
+            left: 0;
+        }
+        
+        .heart-xlarge {
+            width: 28px;
+            height: 25px;
+        }
+        
+        .heart-xlarge:before,
+        .heart-xlarge:after {
+            width: 16px;
+            height: 25px;
+            left: 14px;
+        }
+        
+        .heart-xlarge:after {
+            left: 0;
+        }
+        
+        /* Green color variations */
+        .green-1:before, .green-1:after { background: #22c55e; }
+        .green-2:before, .green-2:after { background: #16a34a; }
+        .green-3:before, .green-3:after { background: #15803d; }
+        .green-4:before, .green-4:after { background: #10b981; }
+        .green-5:before, .green-5:after { background: #059669; }
+        
+        /* Simple, smooth falling animation - NO BLINKING */
+        @keyframes heartDrop {
             0% { 
                 transform: translateY(-50px); 
-                opacity: 0.9;
+                opacity: 0;
             }
-            5% { 
+            8% { 
                 opacity: 1;
             }
-            95% {
-                opacity: 0.8;
+            92% {
+                opacity: 0.7;
             }
             100% { 
                 transform: translateY(65vh); 
-                opacity: 0.3;
+                opacity: 0;
             }
         }
-        
-        /* Size variations for green hearts */
-        .size-1 { font-size: 18px; }
-        .size-2 { font-size: 22px; }
-        .size-3 { font-size: 26px; }
-        .size-4 { font-size: 30px; }
-        .size-5 { font-size: 34px; }
     </style>
 </head>
 <body>
     <div class="hearts-container" id="heartsContainer"></div>
     
     <script>
-        const sizes = ['size-1', 'size-2', 'size-3', 'size-4', 'size-5'];
+        const heartSizes = ['heart-small', 'heart-medium', 'heart-large', 'heart-xlarge'];
+        const greenShades = ['green-1', 'green-2', 'green-3', 'green-4', 'green-5'];
         
-        function createGreenHeart() {
+        function createCSSHeart() {
             const heart = document.createElement('div');
-            heart.className = 'falling-heart';
+            heart.className = 'css-heart';
             
-            // ONLY green heart emoji
-            heart.textContent = "💚";
+            // Random size
+            const sizeClass = heartSizes[Math.floor(Math.random() * heartSizes.length)];
+            heart.classList.add(sizeClass);
+            
+            // Random green shade
+            const colorClass = greenShades[Math.floor(Math.random() * greenShades.length)];
+            heart.classList.add(colorClass);
             
             // Random horizontal position
             heart.style.left = Math.random() * 95 + '%';
             
-            // Random size
-            const sizeClass = sizes[Math.floor(Math.random() * sizes.length)];
-            heart.classList.add(sizeClass);
-            
-            // Random duration for variety (shorter distance)
-            const duration = 2.8 + Math.random() * 1.5; // 2.8 to 4.3 seconds
+            // Random duration (2.5 to 4 seconds)
+            const duration = 2.5 + Math.random() * 1.5;
             heart.style.animationDuration = duration + 's';
             
             // Add to container
             document.getElementById('heartsContainer').appendChild(heart);
             
-            // Clean removal after animation
+            // Remove after animation
             setTimeout(() => {
                 if (heart.parentNode) {
                     heart.parentNode.removeChild(heart);
                 }
-            }, duration * 1000 + 500);
+            }, duration * 1000 + 200);
         }
         
-        // Continuous green heart generation
-        function startGreenHeartRain() {
-            // Immediate start with some hearts
-            for (let i = 0; i < 5; i++) {
+        // Continuous heart generation
+        function startHeartRain() {
+            // Initial hearts
+            for (let i = 0; i < 4; i++) {
                 setTimeout(() => {
-                    createGreenHeart();
-                }, i * 150);
+                    createCSSHeart();
+                }, i * 120);
             }
             
-            // Continuous generation - only green hearts
-            setInterval(() => {
-                createGreenHeart();
+            // Continuous generation
+            const heartInterval = setInterval(() => {
+                createCSSHeart();
                 
-                // Occasionally create 2 hearts close together
-                if (Math.random() < 0.25) {
+                // Sometimes add extra heart
+                if (Math.random() < 0.2) {
                     setTimeout(() => {
-                        createGreenHeart();
-                    }, 80);
+                        createCSSHeart();
+                    }, 60);
                 }
-            }, 350); // Every 350ms
+            }, 300);
         }
         
-        // Auto-start
+        // Start immediately
         window.addEventListener('load', () => {
-            setTimeout(startGreenHeartRain, 300);
+            setTimeout(startHeartRain, 200);
         });
         
-        // Backup generation to ensure continuous flow
+        // Ensure continuous flow
         setInterval(() => {
-            const activeHearts = document.querySelectorAll('.falling-heart').length;
-            if (activeHearts < 3) {
-                createGreenHeart();
-                createGreenHeart();
+            const activeHearts = document.querySelectorAll('.css-heart').length;
+            if (activeHearts < 2) {
+                createCSSHeart();
             }
-        }, 2000);
+        }, 1500);
     </script>
 </body>
 </html>
