@@ -3,68 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notion Hearts</title>
+    <title>Green Hearts Falling</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
         html, body {
             height: 100%;
             background: transparent;
             overflow: hidden;
         }
+        
         .hearts-container {
             position: relative;
             width: 100%;
-            height: 100vh;
+            height: 60vh; /* Reduced height for shorter falling distance */
             background: transparent;
+            overflow: hidden;
         }
+        
         .falling-heart {
             position: absolute;
-            font-size: 32px;
-            animation: heartFall linear forwards;
-            z-index: 999;
+            font-size: 28px;
+            animation: greenHeartFall linear infinite;
+            filter: blur(0px);
+            opacity: 0.8; /* Start with transparency */
         }
-        @keyframes heartFall {
-            0% { transform: translateY(-80px) rotate(0deg); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 0.8; }
-            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        
+        /* Green heart falling animation with blur increase */
+        @keyframes greenHeartFall {
+            0% { 
+                transform: translateY(-80px) rotate(0deg); 
+                opacity: 0;
+                filter: blur(0px);
+            }
+            10% { 
+                opacity: 0.9;
+                filter: blur(0px);
+            }
+            50% {
+                opacity: 0.8;
+                filter: blur(0.5px);
+            }
+            80% {
+                opacity: 0.6;
+                filter: blur(1.5px); /* Increasing blur */
+            }
+            100% { 
+                transform: translateY(60vh) rotate(180deg); /* Shorter distance */
+                opacity: 0.2;
+                filter: blur(3px); /* Maximum blur at bottom */
+            }
         }
+        
+        /* Different heart sizes and speeds */
+        .heart-small {
+            font-size: 20px;
+            animation-duration: 3s;
+        }
+        
+        .heart-medium {
+            font-size: 28px;
+            animation-duration: 4s;
+        }
+        
+        .heart-large {
+            font-size: 36px;
+            animation-duration: 5s;
+        }
+        
+        /* Green color variations */
+        .green-light { color: #00ff88; text-shadow: 0 0 10px rgba(0, 255, 136, 0.5); }
+        .green-medium { color: #00cc66; text-shadow: 0 0 10px rgba(0, 204, 102, 0.5); }
+        .green-dark { color: #009944; text-shadow: 0 0 10px rgba(0, 153, 68, 0.5); }
+        .green-emerald { color: #10b981; text-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
+        .green-mint { color: #34d399; text-shadow: 0 0 10px rgba(52, 211, 153, 0.5); }
     </style>
 </head>
 <body>
-    <div class="hearts-container" id="container"></div>
+    <div class="hearts-container" id="heartsContainer"></div>
     
     <script>
-        const hearts = ["❤️", "💖", "💕", "💗", "💝", "💞", "💓", "♥️"];
+        const greenHeartSymbols = ["💚", "💖", "💕", "💗", "🤍", "💛", "🩷"];
+        const greenColors = ['green-light', 'green-medium', 'green-dark', 'green-emerald', 'green-mint'];
+        const heartSizes = ['heart-small', 'heart-medium', 'heart-large'];
         
-        function createHeart() {
+        function createGreenHeart() {
             const heart = document.createElement('div');
             heart.className = 'falling-heart';
-            heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+            
+            // Random green heart symbol (prioritize green hearts)
+            const symbol = Math.random() < 0.7 ? "💚" : greenHeartSymbols[Math.floor(Math.random() * greenHeartSymbols.length)];
+            heart.textContent = symbol;
+            
+            // Random position across width
             heart.style.left = Math.random() * 100 + '%';
-            heart.style.fontSize = (24 + Math.random() * 20) + 'px';
-            heart.style.animationDuration = (2 + Math.random() * 3) + 's';
             
-            document.getElementById('container').appendChild(heart);
+            // Random size class
+            const sizeClass = heartSizes[Math.floor(Math.random() * heartSizes.length)];
+            heart.classList.add(sizeClass);
             
-            setTimeout(() => heart.remove(), 5000);
-        }
-        
-        // Intense heart generation
-        function startShow() {
-            let count = 0;
-            const interval = setInterval(() => {
-                if (count >= 60) {
-                    clearInterval(interval);
-                    return;
+            // Random green color class
+            const colorClass = greenColors[Math.floor(Math.random() * greenColors.length)];
+            heart.classList.add(colorClass);
+            
+            // Random animation duration (shorter for less distance)
+            const duration = 2.5 + Math.random() * 2; // 2.5 to 4.5 seconds
+            heart.style.animationDuration = duration + 's';
+            
+            // Random delay for staggered effect
+            heart.style.animationDelay = Math.random() * 1 + 's';
+            
+            // Add slight horizontal sway
+            const sway = (Math.random() - 0.5) * 50;
+            heart.style.setProperty('--sway', sway + 'px');
+            
+            document.getElementById('heartsContainer').appendChild(heart);
+            
+            // Remove heart after animation completes
+            setTimeout(() => {
+                if (heart.parentNode) {
+                    heart.parentNode.removeChild(heart);
                 }
-                createHeart();
-                createHeart(); // Double hearts
-                count += 2;
-            }, 150); // Faster generation
+            }, (duration + 1) * 1000); // Add 1s buffer
         }
         
-        window.addEventListener('load', startShow);
+        // Continuous heart generation
+        function startContinuousGreenHearts() {
+            // Initial burst
+            for (let i = 0; i < 8; i++) {
+                setTimeout(() => {
+                    createGreenHeart();
+                }, i * 200);
+            }
+            
+            // Continuous generation every 400ms
+            setInterval(() => {
+                createGreenHeart();
+                
+                // Sometimes create 2 hearts at once for variety
+                if (Math.random() < 0.3) {
+                    setTimeout(() => {
+                        createGreenHeart();
+                    }, 100);
+                }
+            }, 400);
+        }
+        
+        // Start immediately when page loads
+        window.addEventListener('load', () => {
+            setTimeout(startContinuousGreenHearts, 200);
+        });
+        
+        // Ensure continuous animation doesn't stop
+        setInterval(() => {
+            // Check if hearts are still being generated
+            const currentHearts = document.querySelectorAll('.falling-heart').length;
+            if (currentHearts < 5) {
+                // If too few hearts, generate more
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => createGreenHeart(), i * 150);
+                }
+            }
+        }, 3000);
     </script>
 </body>
 </html>
