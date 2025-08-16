@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FireShot CSS Hearts</title>
+    <title>Single Burst Hearts</title>
     <style>
         * { 
             margin: 0; 
@@ -12,25 +12,29 @@
         }
         
         html, body {
-            height: 100%;
+            height: 100vh;
+            width: 100vw;
             background: transparent;
             overflow: hidden;
         }
         
         .hearts-container {
-            position: relative;
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: 60vh;
+            height: 100%;
             background: transparent;
             overflow: hidden;
+            z-index: 9999;
         }
         
-        /* CSS Heart Shape - exactly like FireShot */
+        /* CSS Heart Shape */
         .css-heart {
             position: absolute;
             width: 20px;
             height: 18px;
-            animation: heartDrop linear forwards;
+            animation: singleBlastFall ease-in forwards;
             will-change: transform, opacity;
         }
         
@@ -42,7 +46,7 @@
             position: absolute;
             left: 10px;
             top: 0;
-            background: #22c55e; /* Green color */
+            background: #22c55e;
             border-radius: 10px 10px 0 0;
             transform: rotate(-45deg);
             transform-origin: 0 100%;
@@ -115,96 +119,127 @@
         .green-4:before, .green-4:after { background: #10b981; }
         .green-5:before, .green-5:after { background: #059669; }
         
-        /* Simple, smooth falling animation - NO BLINKING */
-        @keyframes heartDrop {
+        /* Single blast animation - starts from center top, spreads out */
+        @keyframes singleBlastFall {
             0% { 
-                transform: translateY(-50px); 
+                transform: translateY(-30px) translateX(0px) scale(0.8); 
                 opacity: 0;
             }
-            8% { 
+            10% { 
                 opacity: 1;
+                transform: translateY(10px) translateX(var(--spread)) scale(1);
             }
-            92% {
-                opacity: 0.7;
+            90% {
+                opacity: 0.6;
             }
             100% { 
-                transform: translateY(65vh); 
+                transform: translateY(100vh) translateX(var(--spread)) scale(0.9); 
                 opacity: 0;
             }
+        }
+        
+        /* Completion message */
+        .completion-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(34, 197, 94, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 14px;
+            opacity: 0;
+            z-index: 10000;
+            animation: showMessage 3s ease-in-out 8s forwards;
+        }
+        
+        @keyframes showMessage {
+            0%, 80% { opacity: 0; }
+            10%, 70% { opacity: 1; }
+            100% { opacity: 0; }
         }
     </style>
 </head>
 <body>
     <div class="hearts-container" id="heartsContainer"></div>
+    <div class="completion-message" id="completionMsg">🎉 Hearts celebration complete!</div>
     
     <script>
         const heartSizes = ['heart-small', 'heart-medium', 'heart-large', 'heart-xlarge'];
         const greenShades = ['green-1', 'green-2', 'green-3', 'green-4', 'green-5'];
+        let heartsCreated = 0;
+        const maxHearts = 30; // Total hearts in the blast
         
-        function createCSSHeart() {
-            const heart = document.createElement('div');
-            heart.className = 'css-heart';
+        function createBlastHeart(delay = 0) {
+            if (heartsCreated >= maxHearts) return;
             
-            // Random size
-            const sizeClass = heartSizes[Math.floor(Math.random() * heartSizes.length)];
-            heart.classList.add(sizeClass);
-            
-            // Random green shade
-            const colorClass = greenShades[Math.floor(Math.random() * greenShades.length)];
-            heart.classList.add(colorClass);
-            
-            // Random horizontal position
-            heart.style.left = Math.random() * 95 + '%';
-            
-            // Random duration (2.5 to 4 seconds)
-            const duration = 2.5 + Math.random() * 1.5;
-            heart.style.animationDuration = duration + 's';
-            
-            // Add to container
-            document.getElementById('heartsContainer').appendChild(heart);
-            
-            // Remove after animation
             setTimeout(() => {
-                if (heart.parentNode) {
-                    heart.parentNode.removeChild(heart);
-                }
-            }, duration * 1000 + 200);
+                const heart = document.createElement('div');
+                heart.className = 'css-heart';
+                
+                // Random size
+                const sizeClass = heartSizes[Math.floor(Math.random() * heartSizes.length)];
+                heart.classList.add(sizeClass);
+                
+                // Random green shade
+                const colorClass = greenShades[Math.floor(Math.random() * greenShades.length)];
+                heart.classList.add(colorClass);
+                
+                // Start from center top, then spread horizontally
+                const centerX = 50; // Start from center
+                const spreadAmount = (Math.random() - 0.5) * 200; // Spread left/right
+                heart.style.left = centerX + '%';
+                heart.style.setProperty('--spread', spreadAmount + 'px');
+                
+                // Random duration (3 to 6 seconds)
+                const duration = 3 + Math.random() * 3;
+                heart.style.animationDuration = duration + 's';
+                
+                // Add to container
+                document.getElementById('heartsContainer').appendChild(heart);
+                heartsCreated++;
+                
+                // Remove after animation
+                setTimeout(() => {
+                    if (heart.parentNode) {
+                        heart.parentNode.removeChild(heart);
+                    }
+                }, duration * 1000 + 500);
+                
+            }, delay);
         }
         
-        // Continuous heart generation
-        function startHeartRain() {
-            // Initial hearts
-            for (let i = 0; i < 4; i++) {
-                setTimeout(() => {
-                    createCSSHeart();
-                }, i * 120);
+        // Single blast function
+        function startHeartBlast() {
+            console.log('🎉 Starting heart blast!');
+            
+            // Create hearts in quick succession (blast effect)
+            for (let i = 0; i < maxHearts; i++) {
+                createBlastHeart(i * 100); // 100ms delay between each heart
             }
             
-            // Continuous generation
-            const heartInterval = setInterval(() => {
-                createCSSHeart();
-                
-                // Sometimes add extra heart
-                if (Math.random() < 0.2) {
-                    setTimeout(() => {
-                        createCSSHeart();
-                    }, 60);
-                }
-            }, 300);
+            // Show completion message after all hearts are created
+            setTimeout(() => {
+                console.log('✅ Heart blast complete!');
+            }, maxHearts * 100 + 8000);
         }
         
-        // Start immediately
+        // Auto-start the blast after page loads
         window.addEventListener('load', () => {
-            setTimeout(startHeartRain, 200);
+            setTimeout(startHeartBlast, 500);
         });
         
-        // Ensure continuous flow
-        setInterval(() => {
-            const activeHearts = document.querySelectorAll('.css-heart').length;
-            if (activeHearts < 2) {
-                createCSSHeart();
+        // Optional: Restart blast on click (for testing)
+        document.addEventListener('click', () => {
+            if (heartsCreated >= maxHearts) {
+                heartsCreated = 0;
+                // Clear any remaining hearts
+                document.getElementById('heartsContainer').innerHTML = '';
+                setTimeout(startHeartBlast, 200);
             }
-        }, 1500);
+        });
     </script>
 </body>
 </html>
