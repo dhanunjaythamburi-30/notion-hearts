@@ -1,128 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Full Page Falling Hearts</title>
     <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
             background: transparent;
             overflow: hidden;
-            pointer-events: none;
+            height: 100vh;
+            width: 100vw;
         }
-        
-        .hearts-overlay {
-            position: fixed;
+        .hearts-container {
+            position: absolute;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            z-index: 9999;
-            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            overflow: visible; /* Allow hearts to go beyond */
         }
-        
         .falling-heart {
             position: absolute;
-            top: -100px;
-            font-size: 28px;
-            animation: heartFallFullScreen linear forwards;
+            animation: fall linear forwards;
             pointer-events: none;
-            z-index: 10000;
         }
-        
-        @keyframes heartFallFullScreen {
-            0% { 
-                transform: translateY(-100px) rotate(0deg); 
-                opacity: 0; 
-            }
-            5% { opacity: 1; }
-            95% { opacity: 0.7; }
-            100% { 
-                transform: translateY(calc(100vh + 100px)) rotate(360deg); 
-                opacity: 0; 
-            }
-        }
-        
-        /* Make the iframe transparent and full */
-        iframe {
-            background: transparent !important;
+        @keyframes fall {
+            from { transform: translateY(-50px); opacity: 0; }
+            10% { opacity: 1; }
+            to { transform: translateY(100vh); opacity: 0; }
         }
     </style>
 </head>
 <body>
-    <div class="hearts-overlay" id="heartsContainer"></div>
-    
+    <div class="hearts-container" id="hearts"></div>
     <script>
-        const heartSymbols = ["❤️", "💖", "💕", "💗", "💝", "💞", "💓", "♥️"];
-        const heartColors = [
-            "#ff1744", "#ff4569", "#ff6b9d", "#ff8fab", 
-            "#e91e63", "#f06292", "#ce93d8", "#ba68c8"
-        ];
-        
-        function createHeart() {
+        function rain() {
             const heart = document.createElement('div');
             heart.className = 'falling-heart';
-            heart.textContent = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
-            
-            // Random position across full viewport width
-            heart.style.left = Math.random() * 100 + 'vw';
-            heart.style.color = heartColors[Math.floor(Math.random() * heartColors.length)];
-            heart.style.fontSize = (20 + Math.random() * 25) + 'px';
-            heart.style.animationDuration = (4 + Math.random() * 6) + 's';
-            
-            // Add slight horizontal drift
-            const drift = (Math.random() - 0.5) * 200;
-            heart.style.setProperty('--drift', drift + 'px');
-            
-            document.getElementById('heartsContainer').appendChild(heart);
-            
-            // Clean up after animation
-            setTimeout(() => {
-                if (heart.parentNode) {
-                    heart.parentNode.removeChild(heart);
-                }
-            }, 12000);
+            heart.textContent = ['❤️','💖','💕','💗'][Math.floor(Math.random()*4)];
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.fontSize = (15 + Math.random() * 20) + 'px';
+            heart.style.animationDuration = (3 + Math.random() * 4) + 's';
+            document.getElementById('hearts').appendChild(heart);
+            setTimeout(() => heart.remove(), 8000);
         }
-        
-        // Continuous heart generation
-        function startHeartRain() {
-            let count = 0;
-            const maxHearts = 80;
-            
-            const interval = setInterval(() => {
-                if (count >= maxHearts) {
-                    clearInterval(interval);
-                    return;
-                }
-                
-                // Create multiple hearts at once for effect
-                createHeart();
-                setTimeout(() => createHeart(), 100);
-                setTimeout(() => createHeart(), 200);
-                
-                count += 3;
-            }, 400);
-        }
-        
-        // Auto-start when loaded
-        window.addEventListener('load', () => {
-            setTimeout(startHeartRain, 500);
-        });
-        
-        // Try to break out of iframe constraints
-        try {
-            if (window.top !== window.self) {
-                // We're in an iframe, try to access parent
-                window.parent.postMessage('startHearts', '*');
-            }
-        } catch(e) {
-            // Fallback to normal behavior
-            console.log('Running in contained mode');
-        }
+        setInterval(rain, 200);
     </script>
 </body>
 </html>
