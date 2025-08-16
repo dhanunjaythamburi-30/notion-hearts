@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Big Blast Hearts - FireShot Style</title>
+    <title>Pure FireShot Blast</title>
     <style>
         * { 
             margin: 0; 
@@ -29,44 +29,12 @@
             z-index: 9999;
         }
         
-        /* Manual Trigger Button */
-        .trigger-button {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 10000;
-            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
-            transition: all 0.3s ease;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        }
-        
-        .trigger-button:hover {
-            background: linear-gradient(135deg, #16a34a, #15803d);
-            transform: translateX(-50%) translateY(-2px);
-            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
-        }
-        
-        .trigger-button:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-            transform: translateX(-50%);
-        }
-        
-        /* CSS Heart Shape */
+        /* CSS Heart Shape - FireShot Style */
         .css-heart {
             position: absolute;
             width: 20px;
             height: 18px;
-            animation: bigBlastExplosion ease-out forwards;
+            animation: fireshotBlast ease-out forwards;
             will-change: transform, opacity;
         }
         
@@ -91,6 +59,22 @@
         }
         
         /* Heart size variations */
+        .heart-tiny {
+            width: 12px;
+            height: 11px;
+        }
+        
+        .heart-tiny:before,
+        .heart-tiny:after {
+            width: 7px;
+            height: 11px;
+            left: 6px;
+        }
+        
+        .heart-tiny:after {
+            left: 0;
+        }
+        
         .heart-small {
             width: 16px;
             height: 14px;
@@ -113,136 +97,119 @@
         }
         
         .heart-large {
-            width: 24px;
-            height: 22px;
+            width: 26px;
+            height: 23px;
         }
         
         .heart-large:before,
         .heart-large:after {
-            width: 14px;
-            height: 22px;
-            left: 12px;
+            width: 15px;
+            height: 23px;
+            left: 13px;
         }
         
         .heart-large:after {
             left: 0;
         }
         
-        .heart-xlarge {
-            width: 28px;
-            height: 25px;
-        }
-        
-        .heart-xlarge:before,
-        .heart-xlarge:after {
-            width: 16px;
-            height: 25px;
-            left: 14px;
-        }
-        
-        .heart-xlarge:after {
-            left: 0;
-        }
-        
-        /* Green color variations */
-        .green-1:before, .green-1:after { background: #22c55e; }
-        .green-2:before, .green-2:after { background: #16a34a; }
+        /* Green color variations - more natural */
+        .green-1:before, .green-1:after { background: #16a34a; }
+        .green-2:before, .green-2:after { background: #22c55e; }
         .green-3:before, .green-3:after { background: #15803d; }
         .green-4:before, .green-4:after { background: #10b981; }
         .green-5:before, .green-5:after { background: #059669; }
+        .green-6:before, .green-6:after { background: #047857; }
         
-        /* BIG BLAST EXPLOSION - Hearts spread in ALL directions */
-        @keyframes bigBlastExplosion {
+        /* FireShot-style explosion animation */
+        @keyframes fireshotBlast {
             0% { 
-                transform: translateX(-50%) translateY(-50%) scale(0.5) rotate(0deg); 
+                transform: translate(-50%, -50%) scale(0.3) rotate(0deg); 
                 opacity: 0;
             }
-            5% {
-                transform: translateX(-50%) translateY(-50%) scale(1) rotate(0deg); 
+            8% {
+                transform: translate(-50%, -50%) scale(1.1) rotate(15deg); 
+                opacity: 1;
+            }
+            15% {
+                transform: translate(-50%, -50%) scale(1) rotate(30deg); 
                 opacity: 1;
             }
             100% { 
                 transform: 
-                    translateX(calc(-50% + var(--blast-x))) 
-                    translateY(calc(-50% + var(--blast-y))) 
-                    scale(0.8) 
-                    rotate(var(--rotation));
+                    translate(calc(-50% + var(--blast-x)), calc(-50% + var(--blast-y))) 
+                    scale(0.7) 
+                    rotate(var(--end-rotation));
                 opacity: 0;
             }
-        }
-        
-        /* Status message */
-        .status-message {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(34, 197, 94, 0.9);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 15px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            font-size: 12px;
-            opacity: 0;
-            z-index: 10000;
-            transition: opacity 0.3s ease;
         }
     </style>
 </head>
 <body>
-    <button class="trigger-button" id="heartBlastBtn" onclick="triggerBigBlast()">
-        💥 BIG HEART BLAST
-    </button>
-    
     <div class="hearts-container" id="heartsContainer"></div>
-    <div class="status-message" id="statusMsg">Ready for BIG BLAST!</div>
     
     <script>
-        const heartSizes = ['heart-small', 'heart-medium', 'heart-large', 'heart-xlarge'];
-        const greenShades = ['green-1', 'green-2', 'green-3', 'green-4', 'green-5'];
+        const heartSizes = ['heart-tiny', 'heart-small', 'heart-medium', 'heart-large'];
+        const greenShades = ['green-1', 'green-2', 'green-3', 'green-4', 'green-5', 'green-6'];
         let heartsCreated = 0;
-        let isBlasting = false;
-        const maxHearts = 50; // More hearts for bigger blast
+        const maxHearts = 60; // More hearts for fuller blast
         
-        function createExplosionHeart(delay = 0) {
+        function createFireshotHeart(delay = 0) {
             if (heartsCreated >= maxHearts) return;
             
             setTimeout(() => {
                 const heart = document.createElement('div');
                 heart.className = 'css-heart';
                 
-                // Random size
-                const sizeClass = heartSizes[Math.floor(Math.random() * heartSizes.length)];
+                // Random size (more small hearts like FireShot)
+                let sizeClass;
+                const sizeRandom = Math.random();
+                if (sizeRandom < 0.4) sizeClass = 'heart-tiny';
+                else if (sizeRandom < 0.7) sizeClass = 'heart-small';
+                else if (sizeRandom < 0.9) sizeClass = 'heart-medium';
+                else sizeClass = 'heart-large';
+                
                 heart.classList.add(sizeClass);
                 
                 // Random green shade
                 const colorClass = greenShades[Math.floor(Math.random() * greenShades.length)];
                 heart.classList.add(colorClass);
                 
-                // START FROM CENTER OF SCREEN
-                heart.style.left = '50%';
-                heart.style.top = '50%';
+                // Start from random center area (not exact center)
+                const centerVariation = 40;
+                heart.style.left = (50 + (Math.random() - 0.5) * centerVariation) + '%';
+                heart.style.top = (50 + (Math.random() - 0.5) * centerVariation) + '%';
                 
-                // CALCULATE EXPLOSION DIRECTION (360 degrees)
-                const angle = (heartsCreated / maxHearts) * Math.PI * 2 + (Math.random() - 0.5) * 0.8;
+                // FireShot-style explosion pattern
+                // Create clusters and random directions
+                let angle, distance;
                 
-                // EXPLOSION DISTANCE (cover entire screen)
-                const distance = 200 + Math.random() * 400; // 200-600px from center
+                if (Math.random() < 0.3) {
+                    // Cluster explosion (30% of hearts)
+                    const clusterAngle = Math.random() * Math.PI * 2;
+                    angle = clusterAngle + (Math.random() - 0.5) * 0.8;
+                    distance = 150 + Math.random() * 200;
+                } else {
+                    // Random explosion (70% of hearts)
+                    angle = Math.random() * Math.PI * 2;
+                    distance = 100 + Math.random() * 350;
+                }
                 
-                // CALCULATE X,Y EXPLOSION COORDINATES
+                // Calculate explosion coordinates
                 const blastX = Math.cos(angle) * distance;
                 const blastY = Math.sin(angle) * distance;
                 
-                // Random rotation
-                const rotation = Math.random() * 720 - 360;
+                // Random rotation (more dramatic)
+                const endRotation = Math.random() * 1080 - 540; // -540 to +540 degrees
                 
-                // Set CSS custom properties for explosion
+                // Set CSS variables
                 heart.style.setProperty('--blast-x', blastX + 'px');
                 heart.style.setProperty('--blast-y', blastY + 'px');
-                heart.style.setProperty('--rotation', rotation + 'deg');
+                heart.style.setProperty('--end-rotation', endRotation + 'deg');
                 
-                // Random duration (2-4 seconds)
-                const duration = 2 + Math.random() * 2;
+                // Random duration based on distance
+                const baseDuration = 2.5;
+                const distanceFactor = distance / 300;
+                const duration = baseDuration + distanceFactor * 1.5;
                 heart.style.animationDuration = duration + 's';
                 
                 // Add to container
@@ -254,59 +221,42 @@
                     if (heart.parentNode) {
                         heart.parentNode.removeChild(heart);
                     }
-                }, duration * 1000 + 500);
+                }, duration * 1000 + 300);
                 
             }, delay);
         }
         
-        // BIG BLAST FUNCTION
-        function triggerBigBlast() {
-            if (isBlasting) return;
-            
-            // Reset
+        // Pure FireShot blast - no UI
+        function startFireshotBlast() {
             heartsCreated = 0;
-            isBlasting = true;
             
-            // Update UI
-            const button = document.getElementById('heartBlastBtn');
-            const statusMsg = document.getElementById('statusMsg');
-            
-            button.textContent = '💥 EXPLODING...';
-            button.disabled = true;
-            
-            statusMsg.textContent = 'BIG BLAST IN PROGRESS! 🎆';
-            statusMsg.style.opacity = '1';
-            
-            // Clear existing hearts
+            // Clear any existing hearts
             document.getElementById('heartsContainer').innerHTML = '';
             
-            console.log('💥 BIG HEART BLAST TRIGGERED!');
-            
-            // CREATE EXPLOSION - all hearts burst out rapidly
+            // Create the blast with realistic timing
             for (let i = 0; i < maxHearts; i++) {
-                createExplosionHeart(i * 50); // Very rapid - 50ms between hearts
-            }
-            
-            // Reset after blast
-            setTimeout(() => {
-                button.textContent = '💥 BIG HEART BLAST';
-                button.disabled = false;
-                isBlasting = false;
+                // Rapid initial burst, then trailing hearts
+                let delay;
+                if (i < 20) {
+                    delay = i * 30; // Very rapid initial burst
+                } else if (i < 40) {
+                    delay = 600 + (i - 20) * 60; // Medium burst
+                } else {
+                    delay = 1800 + (i - 40) * 100; // Trailing hearts
+                }
                 
-                statusMsg.textContent = 'Explosion complete! Click for another blast!';
-                setTimeout(() => {
-                    statusMsg.style.opacity = '0';
-                }, 3000);
-            }, maxHearts * 50 + 5000);
+                createFireshotHeart(delay);
+            }
         }
         
-        // Initialize
+        // Auto-start the blast immediately
         window.addEventListener('load', () => {
-            const statusMsg = document.getElementById('statusMsg');
-            statusMsg.style.opacity = '1';
-            setTimeout(() => {
-                statusMsg.style.opacity = '0';
-            }, 3000);
+            setTimeout(startFireshotBlast, 800);
+        });
+        
+        // Optional: Click anywhere to restart blast
+        document.addEventListener('click', () => {
+            startFireshotBlast();
         });
     </script>
 </body>
