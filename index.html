@@ -1,48 +1,70 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notion Hearts</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
+        html, body {
+            height: 100%;
             background: transparent;
             overflow: hidden;
-            height: 100vh;
-            width: 100vw;
         }
         .hearts-container {
-            position: absolute;
-            top: 0;
-            left: 0;
+            position: relative;
             width: 100%;
-            height: 100%;
-            overflow: visible; /* Allow hearts to go beyond */
+            height: 100vh;
+            background: transparent;
         }
         .falling-heart {
             position: absolute;
-            animation: fall linear forwards;
-            pointer-events: none;
+            font-size: 32px;
+            animation: heartFall linear forwards;
+            z-index: 999;
         }
-        @keyframes fall {
-            from { transform: translateY(-50px); opacity: 0; }
+        @keyframes heartFall {
+            0% { transform: translateY(-80px) rotate(0deg); opacity: 0; }
             10% { opacity: 1; }
-            to { transform: translateY(100vh); opacity: 0; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
         }
     </style>
 </head>
 <body>
-    <div class="hearts-container" id="hearts"></div>
+    <div class="hearts-container" id="container"></div>
+    
     <script>
-        function rain() {
+        const hearts = ["❤️", "💖", "💕", "💗", "💝", "💞", "💓", "♥️"];
+        
+        function createHeart() {
             const heart = document.createElement('div');
             heart.className = 'falling-heart';
-            heart.textContent = ['❤️','💖','💕','💗'][Math.floor(Math.random()*4)];
+            heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
             heart.style.left = Math.random() * 100 + '%';
-            heart.style.fontSize = (15 + Math.random() * 20) + 'px';
-            heart.style.animationDuration = (3 + Math.random() * 4) + 's';
-            document.getElementById('hearts').appendChild(heart);
-            setTimeout(() => heart.remove(), 8000);
+            heart.style.fontSize = (24 + Math.random() * 20) + 'px';
+            heart.style.animationDuration = (2 + Math.random() * 3) + 's';
+            
+            document.getElementById('container').appendChild(heart);
+            
+            setTimeout(() => heart.remove(), 5000);
         }
-        setInterval(rain, 200);
+        
+        // Intense heart generation
+        function startShow() {
+            let count = 0;
+            const interval = setInterval(() => {
+                if (count >= 60) {
+                    clearInterval(interval);
+                    return;
+                }
+                createHeart();
+                createHeart(); // Double hearts
+                count += 2;
+            }, 150); // Faster generation
+        }
+        
+        window.addEventListener('load', startShow);
     </script>
 </body>
 </html>
